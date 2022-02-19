@@ -3,6 +3,7 @@ package automateNow;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,11 +37,20 @@ public class FormFields {
             driver.findElement(By.xpath(option)).click();
         }
 
+
+        //radio buttons
+
         List<WebElement> radios = driver.findElements(By.xpath((String) prop.get("automatenow.sandbox.formfields.radiobutton.xpath")));
         for(WebElement radio:radios){
             radio.click();
             Thread.sleep(2000);
         }
+
+        //dropdown handling
+
+        WebElement dropdown = driver.findElement(By.name((String) prop.get("automatenow.sandbox.formfields.dropdown.name")));
+        Select select = new Select(dropdown);
+        select.selectByIndex(1);
 
 
 //        driver.quit();

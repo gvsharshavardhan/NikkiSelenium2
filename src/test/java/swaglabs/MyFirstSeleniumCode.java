@@ -28,6 +28,5 @@ public class MyFirstSeleniumCode {
             System.out.println("FAILED!!");
         }
         driver.quit();
-
     }
 }

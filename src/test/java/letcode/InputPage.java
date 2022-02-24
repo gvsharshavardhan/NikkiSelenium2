@@ -1,56 +1,20 @@
 package letcode;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Properties;
 
-public class InputPage {
-    FileInputStream fileInputStream;
-    Properties configProp;
-    Properties letCodeProp;
-    WebDriver driver;
-
-    @BeforeSuite
-    void setupProperties() throws IOException {
-        fileInputStream = new FileInputStream("./ORs/config.properties");
-        configProp = new Properties();
-        configProp.load(fileInputStream);
-        fileInputStream = new FileInputStream("./ORs/letcode.properties");
-        letCodeProp = new Properties();
-        letCodeProp.load(fileInputStream);
-    }
-
-    @BeforeMethod
-    void setupDriver() {
-        String browser = configProp.getProperty("browser");
-        if (browser.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
-        } else if (browser.equalsIgnoreCase("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            driver = new FirefoxDriver();
-        } else {
-            WebDriverManager.edgedriver().setup();
-            driver = new EdgeDriver();
-        }
-        driver.manage().window().maximize();
-        driver.navigate().to(configProp.getProperty("letcode.inputpage.url"));
-    }
+public class InputPage extends BasePage {
 
 
     @Test
     void inputPageTest() throws IOException {
+        driver.findElement(By.xpath(letCodeProp.getProperty("letcode.tabs.xpath").replace("$$", "Edit"))).click();
         String expectedFullName = "nikki";
         WebElement fullNameElement = driver.findElement(By.id(letCodeProp.getProperty("letcode.input.fullname.id")));
         fullNameElement.sendKeys(expectedFullName);
@@ -82,18 +46,4 @@ public class InputPage {
     }
 
 
-    @AfterMethod
-    void shutDown() {
-        driver.quit();
-    }
-
-    @AfterSuite
-    void closeProperties() throws IOException {
-        fileInputStream.close();
-    }
-
-    void takeScreenShot(String screenShotName) throws IOException {
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + ".png"));
-    }
 }

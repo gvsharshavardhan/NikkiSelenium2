@@ -1,0 +1,7 @@
+var titleelements = document.querySelectorAll("ytd-playlist-video-list-renderer a[id='video-title']")
+
+console.log(titleelements.length)
+
+for (let ele of titleelements) {
+    console.log(ele.innerText);
+}

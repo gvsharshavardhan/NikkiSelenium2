@@ -2,12 +2,12 @@ package letcode;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -16,6 +16,7 @@ import org.testng.annotations.BeforeSuite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Properties;
 
 public class BasePage {
@@ -61,8 +62,57 @@ public class BasePage {
         fileInputStream.close();
     }
 
-    void takeScreenShot(String screenShotName) throws IOException {
+    void takeScreenShot(String screenShotName) {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + ".png"));
+        try {
+            FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + ".png"));
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    void takeRest(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void waitUntilAlertIsPresent() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.alertIsPresent());
+    }
+
+    Alert switchToAlert() {
+        return driver.switchTo().alert();
+    }
+
+    void acceptAlert() {
+        switchToAlert().accept();
+    }
+
+    void dismissAlert() {
+        switchToAlert().dismiss();
+    }
+
+    String getTextFromAlert() {
+        return switchToAlert().getText();
+    }
+
+    void sendTextIntoAlert(String text) {
+        switchToAlert().sendKeys(text);
+    }
+
+    WebElement findElement(By by) {
+        return driver.findElement(by);
+    }
+
+    void click(By by) {
+        driver.findElement(by).click();
+    }
+
+    String getTextFromElement(By by) {
+        return driver.findElement(by).getText();
     }
 }

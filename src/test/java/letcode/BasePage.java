@@ -112,7 +112,27 @@ public class BasePage {
         driver.findElement(by).click();
     }
 
+    void click(WebElement element) {
+        element.click();
+    }
+
     String getTextFromElement(By by) {
         return driver.findElement(by).getText();
+    }
+
+    void enterText(By by, String text) {
+        driver.findElement(by).sendKeys(text);
+    }
+
+    void jsScrollIntoView(By by) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(by));
+    }
+
+    void jsScrollAlongYAxisBy(int Ypixels) {
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0," + Ypixels + ")");
+    }
+
+    void jsClick(By by){
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click()",driver.findElement(by));
     }
 }

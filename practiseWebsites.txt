@@ -10,3 +10,7 @@ https://bonigarcia.dev/selenium-webdriver-java/web-form.html
 https://www.saucedemo.com/
 http://omayo.blogspot.com/
 http://leafground.com/home.html
+
+
+G@@d m0rn!ng
+fido/phones -> xpath

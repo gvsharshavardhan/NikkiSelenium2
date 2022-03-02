@@ -16,27 +16,32 @@ import org.testng.annotations.BeforeSuite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Properties;
 
 public class BasePage {
-    FileInputStream fileInputStream;
-    Properties configProp;
-    Properties letCodeProp;
-    WebDriver driver;
+    protected FileInputStream fileInputStream;
+    protected Properties configProp;
+    protected Properties letCodeProp;
+    protected Properties testleafProp;
+    protected WebDriver driver;
 
     @BeforeSuite
-    void setupProperties() throws IOException {
+    protected void setupProperties() throws IOException {
         fileInputStream = new FileInputStream("./ORs/config.properties");
         configProp = new Properties();
         configProp.load(fileInputStream);
         fileInputStream = new FileInputStream("./ORs/letcode.properties");
         letCodeProp = new Properties();
         letCodeProp.load(fileInputStream);
+        fileInputStream = new FileInputStream("./ORs/testleaf.properties");
+        testleafProp = new Properties();
+        testleafProp.load(fileInputStream);
     }
 
     @BeforeMethod
-    void setupDriver() {
+    protected void setupDriver(Method method) {
         String browser = configProp.getProperty("browser");
         if (browser.equalsIgnoreCase("chrome")) {
             WebDriverManager.chromedriver().setup();
@@ -49,20 +54,27 @@ public class BasePage {
             driver = new EdgeDriver();
         }
         driver.manage().window().maximize();
-        driver.navigate().to(configProp.getProperty("letcode.url"));
+        String packageName = method.getDeclaringClass().getPackage().getName();
+        if (packageName.equals("letcode")) {
+            driver.navigate().to(configProp.getProperty("letcode.url"));
+        } else if (packageName.equals("testleaf")) {
+            driver.navigate().to(configProp.getProperty("testleaf.url"));
+        } else {
+            driver.get("https://www.google.com");
+        }
     }
 
     @AfterMethod
-    void shutDown() {
+    protected void shutDown() {
         driver.quit();
     }
 
     @AfterSuite
-    void closeProperties() throws IOException {
+    protected void closeProperties() throws IOException {
         fileInputStream.close();
     }
 
-    void takeScreenShot(String screenShotName) {
+    protected void takeScreenShot(String screenShotName) {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         try {
             FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + ".png"));
@@ -71,7 +83,7 @@ public class BasePage {
         }
     }
 
-    void takeRest(int seconds) {
+    protected void takeRest(int seconds) {
         try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
@@ -79,60 +91,64 @@ public class BasePage {
         }
     }
 
-    void waitUntilAlertIsPresent() {
+    protected void waitUntilAlertIsPresent() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         wait.until(ExpectedConditions.alertIsPresent());
     }
 
-    Alert switchToAlert() {
+    protected Alert switchToAlert() {
         return driver.switchTo().alert();
     }
 
-    void acceptAlert() {
+    protected void acceptAlert() {
         switchToAlert().accept();
     }
 
-    void dismissAlert() {
+    protected void dismissAlert() {
         switchToAlert().dismiss();
     }
 
-    String getTextFromAlert() {
+    protected String getTextFromAlert() {
         return switchToAlert().getText();
     }
 
-    void sendTextIntoAlert(String text) {
+    protected void sendTextIntoAlert(String text) {
         switchToAlert().sendKeys(text);
     }
 
-    WebElement findElement(By by) {
+    protected WebElement getElement(By by) {
         return driver.findElement(by);
     }
 
-    void click(By by) {
+    protected void click(By by) {
         driver.findElement(by).click();
     }
 
-    void click(WebElement element) {
+    protected void click(WebElement element) {
         element.click();
     }
 
-    String getTextFromElement(By by) {
+    protected String getTextFromElement(By by) {
         return driver.findElement(by).getText();
     }
 
-    void enterText(By by, String text) {
+    protected void enterText(By by, String text) {
         driver.findElement(by).sendKeys(text);
     }
 
-    void jsScrollIntoView(By by) {
+    protected void jsScrollIntoView(By by) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(by));
     }
 
-    void jsScrollAlongYAxisBy(int Ypixels) {
+    protected void jsScrollAlongYAxisBy(int Ypixels) {
         ((JavascriptExecutor) driver).executeScript("window.scrollBy(0," + Ypixels + ")");
     }
 
-    void jsClick(By by){
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click()",driver.findElement(by));
+    protected void scrollToBottomOfPage() {
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0,document.body.scrollHeight)");
+    }
+
+    protected void jsClick(By by) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click()", driver.findElement(by));
     }
 }

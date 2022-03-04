@@ -8,6 +8,7 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -18,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class BasePage {
@@ -64,8 +66,12 @@ public class BasePage {
         }
     }
 
-//    @AfterMethod
-    protected void shutDown() {
+    @AfterMethod
+    protected void shutDown(ITestResult result) {
+        String name = result.getName();
+        if (ITestResult.FAILURE == result.getStatus()) {
+            takeScreenShot(name);
+        }
         driver.quit();
     }
 
@@ -77,7 +83,7 @@ public class BasePage {
     protected void takeScreenShot(String screenShotName) {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         try {
-            FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + ".png"));
+            FileUtils.copyFile(screenshot, new File("./screenshots/" + screenShotName + LocalDateTime.now().getNano() + ".png"));
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
